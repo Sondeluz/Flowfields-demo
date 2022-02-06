@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	GRID_HEIGHT = 1000
-	GRID_WIDTH  = 1000
+	GRID_HEIGHT = 20
+	GRID_WIDTH  = 20
 )
 
 type GridPosition struct {
@@ -26,7 +26,7 @@ type Flowfield struct {
 func newRandomFlowFieldWithoutObstacles() Flowfield {
 	rand.Seed(time.Now().UnixNano())
 
-	objective := XYPosition{X: rand.Intn(999), Y: rand.Intn(999)}
+	objective := XYPosition{X: rand.Intn(GRID_WIDTH), Y: rand.Intn(GRID_HEIGHT)}
 
 	return newFlowfield(objective, []XYPosition{})
 }
@@ -64,7 +64,7 @@ func newFlowfield(objective XYPosition, obstacles []XYPosition) (f Flowfield) {
 	// For each grid square
 	for y := range f.grid {
 		for x := range f.grid[y] {
-			if !f.grid[y][x].isObstacle {
+			if !f.grid[y][x].isObstacle && !(y == objective.Y) && !(x == objective.X) {
 				// Get the neighbour with the lowest distance to the objective, using
 				// Manhattan distances
 				closestNeighbour := f.getClosestNeighbour(f.getNeighbours(x, y))
@@ -74,8 +74,9 @@ func newFlowfield(objective XYPosition, obstacles []XYPosition) (f Flowfield) {
 				} else {
 					panic("Found an invalid closest neighbour!") // Same
 				}
-			}
-
+			} else {
+                f.grid[y][x].vector = newXYVector(0, 0)
+            }
 		}
 	}
 

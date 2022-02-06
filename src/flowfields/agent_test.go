@@ -34,5 +34,4 @@ func TestOneAgent(t *testing.T) {
 			a.sharedGrid.free(a.position) // Free the objective
 		}
 	}
-
 }

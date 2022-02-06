@@ -3,6 +3,7 @@ package flowfields
 import (
 	"math/rand"
 	"time"
+    "log"
 )
 
 type Agent struct {
@@ -18,6 +19,8 @@ func NewAgent(id int, startPos XYPosition, flowfield Flowfield, sharedGrid *Shar
 	a.flowfield = flowfield
 	a.sharedGrid = sharedGrid
 
+	sharedGrid.setObjective(flowfield.objective)
+	
 	return a
 }
 
@@ -25,13 +28,14 @@ func NewAgent(id int, startPos XYPosition, flowfield Flowfield, sharedGrid *Shar
 // position is taken by another agent
 func (a *Agent) move() {
 	newPos := a.position.advance(a.flowfield.grid[a.position.Y][a.position.X].vector)
-
-	if !a.sharedGrid.attemptToOccupy(newPos, *a) {
-		a.moveElsewhere(newPos)
-	} else {
-		a.sharedGrid.free(a.position)
-		a.position = newPos
-	}
+    
+    if !a.sharedGrid.attemptToOccupy(newPos, *a) {
+        a.moveElsewhere(newPos)
+    } else {
+        a.sharedGrid.free(a.position)
+        a.position = newPos
+    }
+    
 }
 
 // Attempt to move elsewhere given an old desired position which is occupied
@@ -44,12 +48,12 @@ func (a *Agent) moveElsewhere(oldPos XYPosition) {
 	// neighbours which are free on the shared grid
 	for _, n := range neighbours {
 		if !n.equals(oldPos) && a.sharedGrid.attemptToOccupy(n, *a) {
+            log.Println("moved elsewhere from",oldPos,"to",n)
 			a.sharedGrid.free(a.position)
 			a.position = n
 			return
 		}
 	}
-
 	// If no success, it will remain still and try again later in its next turn
 }
 

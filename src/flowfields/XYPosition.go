@@ -1,5 +1,9 @@
 package flowfields
 
+import (
+    "log"
+)
+
 type XYPosition struct {
 	X int
 	Y int
@@ -21,8 +25,10 @@ func (p1 XYPosition) equals(p2 XYPosition) bool {
 
 // Return the resulting position from advancing it with the given direction
 func (pos *XYPosition) advance(v XYVector) (newPos XYPosition) {
+    
+    
 	newPos.X = pos.X + v.X
 	newPos.Y = pos.Y + v.Y
-
+    log.Println("advancing",pos,"with",v,"res=",newPos)
 	return newPos
 }
