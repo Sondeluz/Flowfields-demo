@@ -71,7 +71,7 @@ func InitDemo(agents int, tps int, debug bool) {
     // Specify the window size as you like. Here, a doubled size is specified.
     ebiten.SetWindowSize(1541, 1059)
     //ebiten.SetWindowSize(1000, 1000)
-    ebiten.SetWindowTitle("Your game's title")
+    ebiten.SetWindowTitle("Flowfields demo")
     game.Init(sg, tick, barrier, agents, tps)
     // Call ebiten.RunGame to start your game loop.
     if err := ebiten.RunGame(game); err != nil {

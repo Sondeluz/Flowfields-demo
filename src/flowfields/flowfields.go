@@ -34,11 +34,11 @@ func newRandomFlowFieldWithoutObstacles() Flowfield {
 func newRandomFlowFieldWithObstacles() Flowfield {
 	rand.Seed(time.Now().UnixNano())
 
-	objective := XYPosition{X: rand.Intn(999), Y: rand.Intn(999)}
+	objective := XYPosition{X: rand.Intn(GRID_WIDTH), Y: rand.Intn(GRID_HEIGHT)}
 
 	obstacles := make([]XYPosition, 0)
-	for i := 0; i < 50; i++ {
-		obstacles = append(obstacles, XYPosition{X: rand.Intn(999), Y: rand.Intn(999)})
+	for i := 0; i < (GRID_WIDTH*GRID_HEIGHT)/4; i++ {
+		obstacles = append(obstacles, XYPosition{X: rand.Intn(GRID_WIDTH), Y: rand.Intn(GRID_HEIGHT)})
 	}
 
 	return newFlowfield(objective, obstacles)
@@ -138,22 +138,22 @@ func (f Flowfield) getNeighbours(x int, y int) (neighbourList []XYPosition) {
 	return neighbourList
 }
 
-func (f Flowfield) getClosestNeighbour(neighbourList []XYPosition) (closestNeihgbour XYPosition) {
+func (f Flowfield) getClosestNeighbour(neighbourList []XYPosition) (closestNeighbour XYPosition) {
 
-	closestNeihgbour.setInvalid()
+	closestNeighbour.setInvalid()
 
 	minDist := math.MaxInt
 
 	for _, pos := range neighbourList {
-		dist := abs(pos.X-f.objective.X) + abs(pos.Y-f.objective.Y)
+		dist := abs(pos.X - f.objective.X) + abs(pos.Y - f.objective.Y)
 
 		if dist < minDist {
 			minDist = dist
-			closestNeihgbour = pos
+			closestNeighbour = pos
 		}
 	}
 
-	return closestNeihgbour
+	return closestNeighbour
 }
 
 func abs(i int) int {

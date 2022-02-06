@@ -2,6 +2,7 @@ package flowfields
 
 import (
 	"sync"
+    "log"
 )
 
 const (
@@ -26,12 +27,16 @@ type SharedGrid struct {
 
 func newSharedGrid() *SharedGrid {
 	grid := make([][]SharedGridPosition, GRID_HEIGHT)
+    
 	for y := range grid {
 		grid[y] = make([]SharedGridPosition, GRID_WIDTH)
+        
 		for col := range grid[y] {
 			grid[y][col].agentID = UNOCCUPIED
 		}
 	}
+	
+	log.Println(grid)
 
 	return &SharedGrid{grid}
 }

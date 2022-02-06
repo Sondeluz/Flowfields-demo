@@ -30,12 +30,12 @@ func (a *Agent) move() {
 	newPos := a.position.advance(a.flowfield.grid[a.position.Y][a.position.X].vector)
     
     if !a.sharedGrid.attemptToOccupy(newPos, *a) {
+        log.Println("tried to occupy without success", newPos)
         a.moveElsewhere(newPos)
     } else {
         a.sharedGrid.free(a.position)
         a.position = newPos
     }
-    
 }
 
 // Attempt to move elsewhere given an old desired position which is occupied
