@@ -29,15 +29,9 @@ func newRandomFlowFieldWithoutObstacles() Flowfield {
 	return newFlowfield(objective, nil)
 }
 
-func newRandomFlowFieldWithObstacles() Flowfield {
+func newRandomFlowFieldWithObstacles(obstacles []XYPosition) Flowfield {
 	rand.Seed(time.Now().UnixNano())
-
 	objective := XYPosition{X: rand.Intn(GRID_WIDTH), Y: rand.Intn(GRID_HEIGHT)}
-
-	obstacles := make([]XYPosition, 0)
-	for i := 0; i < (GRID_WIDTH*GRID_HEIGHT)/4; i++ {
-		obstacles = append(obstacles, XYPosition{X: rand.Intn(GRID_WIDTH), Y: rand.Intn(GRID_HEIGHT)})
-	}
 
 	return newFlowfield(objective, obstacles)
 }

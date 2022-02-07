@@ -13,11 +13,16 @@ const (
     GOPHER_SCALE = 0.111 // Brings it down to 77x52, approx.
     GOPHER_X_OFFSET = 77
     GOPHER_Y_OFFSET = 52
+    
+    DO_NOT_PASS_SCALE = 0.115 // Brings it down to 55x55, approx.
+    DO_NOT_PASS_X_OFFSET = 55
+    DO_NOT_PASS_Y_OFFSET = 55
 ) 
 
 // Game implements ebiten.Game interface.
 type Game struct{
     gopher  *ebiten.Image
+    doNotPass  *ebiten.Image
     sg      *SharedGrid
     tick    chan interface{}
     barrier chan interface{}
@@ -26,6 +31,9 @@ type Game struct{
 
 //go:embed gopher.png
 var gopher embed.FS
+
+//go:embed do_not_pass.png
+var doNotPass embed.FS
 
 func (g *Game) drawSharedGrid (sg *SharedGrid, screen *ebiten.Image) {
     screen.Clear()
@@ -43,7 +51,7 @@ func (g *Game) drawSharedGrid (sg *SharedGrid, screen *ebiten.Image) {
             // Draw positions with different colour depending on whether they are an objective or desired position, and whether they have been reached or not
             if pos.isObjective() && pos.isReached(){
                 ebitenutil.DrawRect(screen, float64(x*GOPHER_X_OFFSET), float64(y*GOPHER_Y_OFFSET), 
-                                    GOPHER_X_OFFSET, GOPHER_Y_OFFSET, color.RGBA{102, 52, 169, 0xff})
+                                    GOPHER_X_OFFSET, GOPHER_Y_OFFSET, color.RGBA{90, 100, 49, 0xff})
             } else if pos.isObjective() && !pos.isReached(){
                 ebitenutil.DrawRect(screen, float64(x*GOPHER_X_OFFSET), float64(y*GOPHER_Y_OFFSET), 
                                     GOPHER_X_OFFSET, GOPHER_Y_OFFSET, color.RGBA{255, 60, 54, 0xff})
@@ -65,6 +73,16 @@ func (g *Game) drawSharedGrid (sg *SharedGrid, screen *ebiten.Image) {
                 op.GeoM.Translate(float64(x*GOPHER_X_OFFSET), float64(y*GOPHER_Y_OFFSET)) // right, down
                 screen.DrawImage(g.gopher, op)
             }
+            
+            // evaluate all the previous conditions anyway, 
+            // it would help checking if it has been crossed
+            // due to a logic error
+            if pos.isObstacle() {
+                op := &ebiten.DrawImageOptions{}
+                op.GeoM.Scale(DO_NOT_PASS_SCALE, DO_NOT_PASS_SCALE) 
+                op.GeoM.Translate(float64(x*DO_NOT_PASS_X_OFFSET), float64(y*DO_NOT_PASS_Y_OFFSET)) // right, down
+                screen.DrawImage(g.doNotPass, op)
+            }
 		}
 	}
 }
@@ -72,7 +90,21 @@ func (g *Game) drawSharedGrid (sg *SharedGrid, screen *ebiten.Image) {
 
 func (g *Game) Init(sg *SharedGrid, tick chan interface{}, barrier chan interface{}, agents int, tps int) {
     var err error
-    g.gopher, _, err = ebitenutil.NewImageFromFile("gopher.png")
+    
+    embed, err := gopher.Open("gopher.png")
+    if err != nil {
+		log.Fatal(err)
+	}
+    g.gopher, _, err = ebitenutil.NewImageFromReader(embed)
+    if err != nil {
+		log.Fatal(err)
+	}
+	
+	embed, err = doNotPass.Open("do_not_pass.png")
+    if err != nil {
+		log.Fatal(err)
+	}
+    g.doNotPass, _, err = ebitenutil.NewImageFromReader(embed)
     if err != nil {
 		log.Fatal(err)
 	}

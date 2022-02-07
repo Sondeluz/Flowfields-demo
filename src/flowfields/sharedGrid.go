@@ -18,6 +18,7 @@ type SharedGridPosition struct {
 	objective              bool
 	reached                bool
 	desired                bool 
+	obstacle             bool
 }
 
 // Shared grid between all agents
@@ -25,7 +26,7 @@ type SharedGrid struct {
 	grid [][]SharedGridPosition
 }
 
-func newSharedGrid() *SharedGrid {
+func newSharedGrid(obstacles []XYPosition) *SharedGrid {
 	grid := make([][]SharedGridPosition, GRID_HEIGHT)
     
 	for y := range grid {
@@ -34,6 +35,10 @@ func newSharedGrid() *SharedGrid {
 		for col := range grid[y] {
 			grid[y][col].agentID = UNOCCUPIED
 		}
+	}
+	
+	for _, pos := range obstacles { // Set up obstacles
+		grid[pos.Y][pos.X].obstacle = true
 	}
 	
 	return &SharedGrid{grid}
@@ -104,6 +109,12 @@ func (s *SharedGridPosition) isDesired() bool {
     return s.desired
 }
 
+
+func (s *SharedGridPosition) isObstacle() bool {
+	// No need to lock since the value is immutable
+
+    return s.obstacle
+}
 
 func (s *SharedGrid) setObjective(pos XYPosition) {
 	if pos.X < 0 || pos.Y < 0 || pos.X > GRID_WIDTH || pos.Y > GRID_HEIGHT {

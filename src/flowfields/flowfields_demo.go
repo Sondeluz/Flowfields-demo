@@ -5,17 +5,20 @@ import (
     "github.com/hajimehoshi/ebiten/v2"
     "os"
     "strconv"
+    "math/rand"
+    "time"
 )
 
 const (
     MAX_MOVES_DEMO = 1000
+    OBSTACLES = 6
 )
 
 
 func InitDemo(agents int, tps int, debug bool) {
-    sg := newSharedGrid()
-	//f := newRandomFlowFieldWithoutObstacles()
-	//obj := f.getObjective()
+    rand.Seed(time.Now().UnixNano())
+
+    sg := newSharedGrid(nil)
 	tick := make(chan interface{}, 2)
     barrier := make(chan interface{}, 2)
     
