@@ -9,6 +9,8 @@ This is a very limited demo for concurrent flowfield pathfinding I did in a coup
 Its current limitations are:
 - There are no physics (velocity, collisions, etc.): every agent moves exactly one cell per movement, based on its current cell neighbours and other agents which may be occupying these cells.
 
+- There are no predictions and look-aheads, since there is a hard constraint that no two agents can occupy the same cell at any given time.
+
 - The structure is designed for debugging rather than performance and usability: 
   - The solution is inherently concurrent but forces each agent to synchronize with a barrier in order to coordinate their movements and render them.
   - Each agent has one flowfield irregardless of other agents who may have the same objective, and also share a shared flowfield for tracking other agents. These two structures should be joined together in order to not duplicate data.
