@@ -6,7 +6,14 @@ import (
 	_ "image/png"
 	"log"
     "image/color"
+    "embed"
 )
+
+const (
+    GOPHER_SCALE = 0.111 // Brings it down to 77x52, approx.
+    GOPHER_X_OFFSET = 77
+    GOPHER_Y_OFFSET = 52
+) 
 
 // Game implements ebiten.Game interface.
 type Game struct{
@@ -17,6 +24,9 @@ type Game struct{
     agents  int
 }
 
+//go:embed gopher.png
+var gopher embed.FS
+
 func (g *Game) drawSharedGrid (sg *SharedGrid, screen *ebiten.Image) {
     screen.Clear()
     screen.Fill(color.RGBA{102, 99, 169, 0xff})
@@ -24,25 +34,35 @@ func (g *Game) drawSharedGrid (sg *SharedGrid, screen *ebiten.Image) {
     
     for y := range sg.grid {
 		for x, pos := range sg.grid[y] {
-            ebitenutil.DrawLine(screen, float64(x*77), float64(y*52), float64(x*77)+77, float64(y*52), color.White)
-            ebitenutil.DrawLine(screen, float64(x*77), float64(y*52), float64(x*77), float64(y*52)+52, color.White)
+            // Draw grid lines
+            ebitenutil.DrawLine(screen, float64(x*GOPHER_X_OFFSET), float64(y*GOPHER_Y_OFFSET), 
+                                float64(x*GOPHER_X_OFFSET)+GOPHER_X_OFFSET, float64(y*GOPHER_Y_OFFSET), color.White)
+            ebitenutil.DrawLine(screen, float64(x*GOPHER_X_OFFSET), float64(y*GOPHER_Y_OFFSET), 
+                                float64(x*GOPHER_X_OFFSET), float64(y*GOPHER_Y_OFFSET)+GOPHER_Y_OFFSET, color.White)
             
+            // Draw positions with different colour depending on whether they are an objective or desired position, and whether they have been reached or not
             if pos.isObjective() && pos.isReached(){
-                ebitenutil.DrawRect(screen, float64(x*77), float64(y*52), 77, 52, color.RGBA{102, 252, 169, 0xff})
+                ebitenutil.DrawRect(screen, float64(x*GOPHER_X_OFFSET), float64(y*GOPHER_Y_OFFSET), 
+                                    GOPHER_X_OFFSET, GOPHER_Y_OFFSET, color.RGBA{102, 52, 169, 0xff})
             } else if pos.isObjective() && !pos.isReached(){
-                ebitenutil.DrawRect(screen, float64(x*77), float64(y*52), 77, 52, color.RGBA{255, 60, 54, 0xff})
+                ebitenutil.DrawRect(screen, float64(x*GOPHER_X_OFFSET), float64(y*GOPHER_Y_OFFSET), 
+                                    GOPHER_X_OFFSET, GOPHER_Y_OFFSET, color.RGBA{255, 60, 54, 0xff})
             } else if pos.isDesired() && pos.isReached() {
-                ebitenutil.DrawRect(screen, float64(x*77), float64(y*52), 77, 52, color.RGBA{255, 255, 45, 0xff})
+                ebitenutil.DrawRect(screen, float64(x*GOPHER_X_OFFSET), float64(y*GOPHER_Y_OFFSET), 
+                                    GOPHER_X_OFFSET, GOPHER_Y_OFFSET, color.RGBA{255, 255, 45, 0xff})
             } else if pos.isDesired() && !pos.isReached() {
-                ebitenutil.DrawRect(screen, float64(x*77), float64(y*52), 77, 52, color.RGBA{60, 94, 66, 0xff})
+                ebitenutil.DrawRect(screen, float64(x*GOPHER_X_OFFSET), float64(y*GOPHER_Y_OFFSET), 
+                                    GOPHER_X_OFFSET, GOPHER_Y_OFFSET, color.RGBA{60, 94, 66, 0xff})
             } else if !pos.isDesired() && pos.isReached() {
-                ebitenutil.DrawRect(screen, float64(x*77), float64(y*52), 77, 52, color.RGBA{255, 150, 45, 0xff})
-            }
+                ebitenutil.DrawRect(screen, float64(x*GOPHER_X_OFFSET), float64(y*GOPHER_Y_OFFSET), 
+                                    GOPHER_X_OFFSET, GOPHER_Y_OFFSET, color.RGBA{255, 150, 45, 0xff})
+            } // else: uncoloured
             
+            // Draw a gopher in occupied positions
             if pos.isOccupied() {
                 op := &ebiten.DrawImageOptions{}
-                op.GeoM.Scale(0.111, 0.111) // 77x52, approx.
-                op.GeoM.Translate(float64(x*77), float64(y*52)) // right, down
+                op.GeoM.Scale(GOPHER_SCALE, GOPHER_SCALE) 
+                op.GeoM.Translate(float64(x*GOPHER_X_OFFSET), float64(y*GOPHER_Y_OFFSET)) // right, down
                 screen.DrawImage(g.gopher, op)
             }
 		}

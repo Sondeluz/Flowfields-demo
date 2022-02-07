@@ -2,7 +2,6 @@ package flowfields
 
 import (
 	"sync"
-    "log"
 )
 
 const (
@@ -37,8 +36,6 @@ func newSharedGrid() *SharedGrid {
 		}
 	}
 	
-	log.Println(grid)
-
 	return &SharedGrid{grid}
 }
 
