@@ -2,8 +2,6 @@ package flowfields
 
 import (
 	"math"
-	//"log"
-	//"fmt"
 	"math/rand"
 	"time"
 )
@@ -28,7 +26,7 @@ func newRandomFlowFieldWithoutObstacles() Flowfield {
 
 	objective := XYPosition{X: rand.Intn(GRID_WIDTH), Y: rand.Intn(GRID_HEIGHT)}
 
-	return newFlowfield(objective, []XYPosition{})
+	return newFlowfield(objective, nil)
 }
 
 func newRandomFlowFieldWithObstacles() Flowfield {
@@ -64,13 +62,16 @@ func newFlowfield(objective XYPosition, obstacles []XYPosition) (f Flowfield) {
 	// For each grid square
 	for y := range f.grid {
 		for x := range f.grid[y] {
-			if !f.grid[y][x].isObstacle && !(y == objective.Y) && !(x == objective.X) {
+			if !f.grid[y][x].isObstacle {
 				// Get the neighbour with the lowest distance to the objective, using
 				// Manhattan distances
 				closestNeighbour := f.getClosestNeighbour(f.getNeighbours(x, y))
 
 				if closestNeighbour.isValid() {
-					f.grid[y][x].vector = newXYVector(closestNeighbour.X-x, closestNeighbour.Y-y)
+                    newVector := newXYVector(closestNeighbour.X-x, closestNeighbour.Y-y)
+
+                    
+					f.grid[y][x].vector = newVector
 				} else {
 					panic("Found an invalid closest neighbour!") // Same
 				}
@@ -141,7 +142,7 @@ func (f Flowfield) getNeighbours(x int, y int) (neighbourList []XYPosition) {
 func (f Flowfield) getClosestNeighbour(neighbourList []XYPosition) (closestNeighbour XYPosition) {
 
 	closestNeighbour.setInvalid()
-
+    
 	minDist := math.MaxInt
 
 	for _, pos := range neighbourList {

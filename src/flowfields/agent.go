@@ -3,7 +3,6 @@ package flowfields
 import (
 	"math/rand"
 	"time"
-    "log"
 )
 
 type Agent struct {
@@ -29,12 +28,14 @@ func NewAgent(id int, startPos XYPosition, flowfield Flowfield, sharedGrid *Shar
 func (a *Agent) move() {
 	newPos := a.position.advance(a.flowfield.grid[a.position.Y][a.position.X].vector)
     
+    a.sharedGrid.setDesired(newPos)
+    
     if !a.sharedGrid.attemptToOccupy(newPos, *a) {
-        log.Println("tried to occupy without success", newPos)
         a.moveElsewhere(newPos)
     } else {
         a.sharedGrid.free(a.position)
         a.position = newPos
+        a.sharedGrid.setReached(newPos)
     }
 }
 
@@ -48,9 +49,9 @@ func (a *Agent) moveElsewhere(oldPos XYPosition) {
 	// neighbours which are free on the shared grid
 	for _, n := range neighbours {
 		if !n.equals(oldPos) && a.sharedGrid.attemptToOccupy(n, *a) {
-            log.Println("moved elsewhere from",oldPos,"to",n)
 			a.sharedGrid.free(a.position)
 			a.position = n
+			a.sharedGrid.setReached(n)
 			return
 		}
 	}

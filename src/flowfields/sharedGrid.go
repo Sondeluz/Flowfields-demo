@@ -18,6 +18,7 @@ type SharedGridPosition struct {
 	mtx                    sync.Mutex // mutex for this position
 	objective              bool
 	reached                bool
+	desired                bool 
 }
 
 // Shared grid between all agents
@@ -97,6 +98,15 @@ func (s *SharedGridPosition) isReached() bool {
     return s.reached
 }
 
+// Returns true if an agent had this position
+// as part of its desired part
+func (s *SharedGridPosition) isDesired() bool {
+	s.mtx.Lock()
+	defer s.mtx.Unlock()
+
+    return s.desired
+}
+
 
 func (s *SharedGrid) setObjective(pos XYPosition) {
 	if pos.X < 0 || pos.Y < 0 || pos.X > GRID_WIDTH || pos.Y > GRID_HEIGHT {
@@ -118,4 +128,15 @@ func (s *SharedGrid) setReached(pos XYPosition) {
 	defer s.grid[pos.Y][pos.X].mtx.Unlock()
 
 	s.grid[pos.Y][pos.X].reached = true
+}
+
+func (s *SharedGrid) setDesired(pos XYPosition) {
+	if pos.X < 0 || pos.Y < 0 || pos.X > GRID_WIDTH || pos.Y > GRID_HEIGHT {
+		panic("Invalid shared grid position")
+	}
+
+	s.grid[pos.Y][pos.X].mtx.Lock()
+	defer s.grid[pos.Y][pos.X].mtx.Unlock()
+
+	s.grid[pos.Y][pos.X].desired = true
 }

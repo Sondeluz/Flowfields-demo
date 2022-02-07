@@ -19,10 +19,8 @@ type Game struct{
 
 func (g *Game) drawSharedGrid (sg *SharedGrid, screen *ebiten.Image) {
     screen.Clear()
-    //screen.Fill(color.RGBA{102, 99, 169, 1})
     screen.Fill(color.RGBA{102, 99, 169, 0xff})
-    op := &ebiten.DrawImageOptions{}
-	op.GeoM.Scale(0.111, 0.111) // 77x52, approx.
+    
     
     for y := range sg.grid {
 		for x, pos := range sg.grid[y] {
@@ -33,9 +31,17 @@ func (g *Game) drawSharedGrid (sg *SharedGrid, screen *ebiten.Image) {
                 ebitenutil.DrawRect(screen, float64(x*77), float64(y*52), 77, 52, color.RGBA{102, 252, 169, 0xff})
             } else if pos.isObjective() && !pos.isReached(){
                 ebitenutil.DrawRect(screen, float64(x*77), float64(y*52), 77, 52, color.RGBA{255, 60, 54, 0xff})
+            } else if pos.isDesired() && pos.isReached() {
+                ebitenutil.DrawRect(screen, float64(x*77), float64(y*52), 77, 52, color.RGBA{255, 255, 45, 0xff})
+            } else if pos.isDesired() && !pos.isReached() {
+                ebitenutil.DrawRect(screen, float64(x*77), float64(y*52), 77, 52, color.RGBA{60, 94, 66, 0xff})
+            } else if !pos.isDesired() && pos.isReached() {
+                ebitenutil.DrawRect(screen, float64(x*77), float64(y*52), 77, 52, color.RGBA{255, 150, 45, 0xff})
             }
             
             if pos.isOccupied() {
+                op := &ebiten.DrawImageOptions{}
+                op.GeoM.Scale(0.111, 0.111) // 77x52, approx.
                 op.GeoM.Translate(float64(x*77), float64(y*52)) // right, down
                 screen.DrawImage(g.gopher, op)
             }
