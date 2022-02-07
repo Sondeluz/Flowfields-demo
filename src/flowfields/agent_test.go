@@ -13,7 +13,7 @@ func TestOneAgent(t *testing.T) {
 	f := newRandomFlowFieldWithoutObstacles()
 	obj := f.getObjective()
 	flowfield := newRandomFlowFieldWithoutObstacles()
-	sg := newSharedGrid()
+	sg := newSharedGrid(nil)
 
 	for y := 0; y < GRID_HEIGHT; y++ {
 		for x := 0; x < GRID_WIDTH; x++ {
