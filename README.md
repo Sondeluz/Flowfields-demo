@@ -42,4 +42,4 @@ Upon running it, a grid will show up. Each agent is represented by a Go's gopher
 - If the cell is yellow: It has been crossed by an agent as part of its desired path
 - If the cell is orange: A cell which was part of the path of an agent has not been crossed, in order to avoid colliding with another agent.
 - If the cell is red: The cell is the objective for an agent
-- If the cell is green: The cell is an objective reached by an agent
+- If the cell is green(ish): The cell is an objective reached by an agent
